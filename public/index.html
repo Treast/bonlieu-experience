@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Kinect</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <canvas height="1080" width="1920"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    <script>
+        var socket = io.connect();
+        var canvas = document.querySelector('canvas');
+        var ctx = canvas.getContext('2d');
+        socket.on('bodyFrame', function(frame) {
+            for(var i = 0; i < frame.bodies.length; i++) {
+                var body = frame.bodies[i];
+                if(body.tracked) {
+                    draw(body)
+                }
+            }
+        });
+
+        function draw(body) {
+            var leftHand = body.joints[7];
+            var rightHand = body.joints[11];
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+            ctx.beginPath();
+            ctx.fillRect(0, 0, 1920, 1080);
+            ctx.fillStyle = "green";
+            for(var i = 0; i < body.joints.length; i++) {
+                var joint = body.joints[i];
+                ctx.beginPath();
+                ctx.arc(joint.depthX * 1920, joint.depthY * 1080, 10, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+        }
+    </script>
+</body>
+</html>
